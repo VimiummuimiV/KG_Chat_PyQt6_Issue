@@ -1693,13 +1693,18 @@ class ChatWindow(QWidget):
             if hasattr(self, 'button_panel') and hasattr(self.button_panel, 'reconnect_button'):
                 self.button_panel.reconnect_button.setVisible(True)
             
+            print(f"🔍 Offline check: allow_reconnect={self.allow_reconnect}, is_connecting={self.is_connecting}, has_account={bool(self.account)}")
             if self.allow_reconnect and not self.is_connecting and self.account:
                 print("🔄 Connection lost - initiating auto-reconnect...")
                 QTimer.singleShot(100, self._auto_reconnect)
+            else:
+                print(f"⛔ Auto-reconnect skipped")
 
     def _auto_reconnect(self):
         """Auto-reconnect with exponential backoff (max 10 attempts)"""
+        print(f"🔍 _auto_reconnect check: allow={self.allow_reconnect}, is_connecting={self.is_connecting}, connected={self._is_connected()}, has_account={bool(self.account)}")
         if not self.allow_reconnect or self.is_connecting or self._is_connected() or not self.account:
+            print(f"⛔ _auto_reconnect aborted")
             return
         
         # Max 10 attempts

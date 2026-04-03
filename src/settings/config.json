@@ -81,8 +81,9 @@
     "emoticon_selector_visible": false,
     "always_on_top": false,
     "recent_emoticons": [
-      "confuse",
       "complaugh",
+      "badcomp",
+      "confuse",
       "vpered",
       "uzi",
       "firework",
@@ -99,8 +100,7 @@
       "blink",
       "christmasevil",
       "armyscare",
-      "bye",
-      "dandy"
+      "bye"
     ],
     "window": {
       "width": null,
@@ -124,7 +124,7 @@
         "y": 0
       }
     ],
-    "emoticon_last_group": "recent",
+    "emoticon_last_group": "boys",
     "emoticon_nav_positions": {
       "recent": 0,
       "army": 0,

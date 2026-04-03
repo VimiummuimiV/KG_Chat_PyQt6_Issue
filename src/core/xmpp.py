@@ -130,30 +130,37 @@ class XMPPClient:
        
         try:
             # Initialize session
+            print(f"🔌 [1/5] Sending session init to {self.url}...")
             payload = self.build_body(to=self.domain, **self.conn_params)
             root = self.parse_xml(self.send_request(payload, verbose=False, timeout=10))
             if root is not None:
                 self.sid = root.get('sid')
-                print(f"✅ Connected - SID: {self.sid}")
-           
+                print(f"✅ [1/5] Session init OK - SID: {self.sid}")
+            else:
+                print(f"❌ [1/5] Session init failed - no XML response")
+
             if not self.sid:
+                print(f"❌ [1/5] No SID received - aborting connect")
                 return False
-           
+
             # Auth
+            print(f"🔐 [2/5] Sending auth for user: {chat_username}...")
             self.rid += 1
             authcid = f'{user_id}#{chat_username}'
             auth_str = f'\0{authcid}\0{chat_password}'
             auth_b64 = base64.b64encode(auth_str.encode('utf-8')).decode('ascii')
-           
+
             auth_elem = ET.Element('auth', {
                 'xmlns': 'urn:ietf:params:xml:ns:xmpp-sasl',
                 'mechanism': 'PLAIN'
             })
             auth_elem.text = auth_b64
-           
+
             self.send_request(self.build_body(children=[auth_elem]), verbose=False, timeout=10)
-           
+            print(f"✅ [2/5] Auth sent OK")
+
             # Restart stream
+            print(f"🔄 [3/5] Restarting stream...")
             self.rid += 1
             payload = self.build_body(**{
                 'xmpp:restart': 'true',
@@ -161,50 +168,46 @@ class XMPPClient:
                 'xml:lang': 'en'
             })
             self.send_request(payload, verbose=False, timeout=10)
-           
+            print(f"✅ [3/5] Stream restart OK")
+
             # Bind resource
+            print(f"📎 [4/5] Binding resource...")
             self.rid += 1
             iq = ET.Element('iq', {'type': 'set', 'id': 'bind_1', 'xmlns': 'jabber:client'})
             bind = ET.SubElement(iq, 'bind', {'xmlns': 'urn:ietf:params:xml:ns:xmpp-bind'})
             ET.SubElement(bind, 'resource').text = self.resource
-           
+
             root = self.parse_xml(self.send_request(self.build_body(children=[iq]), verbose=False, timeout=10))
             if root is not None:
                 jid_el = root.find('.//{urn:ietf:params:xml:ns:xmpp-bind}jid')
                 if jid_el is not None:
                     self.jid = jid_el.text
-                    print(f"✅ Authenticated")
-           
+                    print(f"✅ [4/5] Bind OK - JID: {self.jid}")
+                else:
+                    print(f"❌ [4/5] Bind response received but no JID element found")
+            else:
+                print(f"❌ [4/5] Bind failed - no XML response")
+
             if not self.jid:
+                print(f"❌ [4/5] No JID - aborting connect")
                 return False
-           
+
             # Session
+            print(f"🗂️ [5/5] Starting session...")
             self.rid += 1
             iq = ET.Element('iq', {'type': 'set', 'id': 'session_1', 'xmlns': 'jabber:client'})
             ET.SubElement(iq, 'session', {'xmlns': 'urn:ietf:params:xml:ns:xmpp-session'})
             self.send_request(self.build_body(children=[iq]), verbose=False, timeout=10)
-           
+            print(f"✅ [5/5] Session OK - connect complete")
+
             return True
-           
-        except requests.Timeout:
-            # Log timeout only once per minute to avoid spamming
-            if not hasattr(self, '_last_log') or (datetime.now() - self._last_log).seconds > 60:
-                print("❌ Connection timeout")
-                self._last_log = datetime.now()
+
+        except requests.Timeout as e:
+            print(f"❌ Connection timeout: {e}")
             return False
-            
+
         except Exception as e:
-            # Log other errors only if they are different from the last one or if it's been more than a minute
-            error_str = str(e)
-            should_log = (
-                not hasattr(self, '_last_error') or 
-                self._last_error != error_str or 
-                (datetime.now() - self._last_log).seconds > 60
-            )
-            if should_log:
-                print(f"❌ Connection error: {error_str}")
-                self._last_log = datetime.now()
-                self._last_error = error_str
+            print(f"❌ Connection error: {type(e).__name__}: {e}")
             return False
    
     def join_room(self, room_jid, nickname=None):
@@ -390,24 +393,29 @@ class XMPPClient:
     def listen(self):
         """Listen for messages"""
         print("📡 Listening...\n")
-       
+        poll_count = 0
         try:
             while True:
                 self.rid += 1
+                poll_count += 1
+                if poll_count % 10 == 1:
+                    print(f"📡 Long-poll #{poll_count} (RID: {self.rid})")
                 response = self.send_request(self.build_body(), verbose=False, timeout=70)
                
                 root = self.parse_xml(response)
                 if root is not None:
                     if root.get('type') == 'terminate':
-                        print("\n⚠️ Terminated")
+                        print(f"\n⚠️ Server sent terminate after {poll_count} polls")
                         break
                    
                     self._process_response(response)
        
         except KeyboardInterrupt:
             print("\n👋 Bye")
+        except requests.Timeout as e:
+            print(f"\n❌ Listen timeout after {poll_count} polls: {e}")
         except Exception as e:
-            print(f"\n❌ Error: {e}")
+            print(f"\n❌ Listen error after {poll_count} polls: {type(e).__name__}: {e}")
    
     def disconnect(self):
         """Disconnect"""
