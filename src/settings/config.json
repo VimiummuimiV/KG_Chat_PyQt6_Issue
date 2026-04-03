@@ -1,0 +1,150 @@
+{
+  "server": {
+    "url": "https://klavogonki.ru/xmpp-httpbind/",
+    "domain": "jabber.klavogonki.ru",
+    "resource": "web"
+  },
+  "rooms": [
+    {
+      "jid": "general@conference.jabber.klavogonki.ru",
+      "name": "General",
+      "auto_join": true
+    }
+  ],
+  "connection": {
+    "wait": "60",
+    "hold": "1",
+    "content_type": "text/xml; charset=utf-8",
+    "version": "1.6",
+    "xmpp_version": "1.0",
+    "lang": "en"
+  },
+  "ui": {
+    "ui_font_size": 12,
+    "text_font_size": 15,
+    "header_font_size": 18,
+    "text_font_family": "Roboto",
+    "emoji_font_family": "Noto Color Emoji",
+    "messages_userlist_visible": true,
+    "chatlog_userlist_visible": true,
+    "chatlog_search_visible": false,
+    "theme": "dark",
+    "notification_width": 550,
+    "notification_position": "right",
+    "emoticon_max_size": 140,
+    "scroll_button_threshold": 100,
+    "private_message_color": {
+      "hue": 0,
+      "saturation": 75
+    },
+    "ban_message_color": {
+      "hue": 170,
+      "saturation": 75
+    },
+    "system_message_color": {
+      "hue": 240,
+      "saturation": 0
+    },
+    "youtube": {
+      "enabled": true
+    },
+    "buttons": {
+      "large_button": {
+        "icon_size": 30,
+        "button_size": 48
+      },
+      "small_button": {
+        "icon_size": 20,
+        "button_size": 32
+      },
+      "spacing": 8
+    },
+    "spacing": {
+      "window_content": 10,
+      "widget_content": 6,
+      "widget_elements": 6,
+      "list_items": 2,
+      "section_gap": 12
+    },
+    "margins": {
+      "window": 10,
+      "widget": 5,
+      "list": 2,
+      "notification": 8
+    },
+    "message": {
+      "padding": 2,
+      "vertical_spacing": 2,
+      "element_spacing": 10
+    },
+    "input_height": 48,
+    "emoticon_selector_visible": false,
+    "always_on_top": false,
+    "recent_emoticons": [
+      "confuse",
+      "complaugh",
+      "vpered",
+      "uzi",
+      "firework",
+      "foolrifle",
+      "comandos",
+      "clapping",
+      "mafia",
+      "chaingun",
+      "barret",
+      "biggrin",
+      "holmes",
+      "boystroking",
+      "cool",
+      "blink",
+      "christmasevil",
+      "armyscare",
+      "bye",
+      "dandy"
+    ],
+    "window": {
+      "width": null,
+      "height": null,
+      "x": null,
+      "y": null
+    },
+    "window_presets": [
+      {
+        "name": "Full height Narrow Left",
+        "width": 638,
+        "height": 1368,
+        "x": 1,
+        "y": 0
+      },
+      {
+        "name": "Full height Narrow Right",
+        "width": 638,
+        "height": 1368,
+        "x": 1921,
+        "y": 0
+      }
+    ],
+    "emoticon_last_group": "recent",
+    "emoticon_nav_positions": {
+      "recent": 0,
+      "army": 0,
+      "boys": 0,
+      "christmas": 0,
+      "girls": 0,
+      "halloween": 0,
+      "inlove": 0
+    }
+  },
+  "sound": {
+    "tts_enabled": true,
+    "effects_enabled": true
+  },
+  "notification": {
+    "mode": "replace",
+    "muted": false
+  },
+  "startup": {
+    "auto_login": true,
+    "start_minimized": true
+  }
+}
