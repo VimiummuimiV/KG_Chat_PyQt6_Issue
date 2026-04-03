@@ -132,7 +132,7 @@ class XMPPClient:
             # Initialize session
             print(f"🔌 [1/5] Sending session init to {self.url}...")
             payload = self.build_body(to=self.domain, **self.conn_params)
-            root = self.parse_xml(self.send_request(payload, verbose=False, timeout=10))
+            root = self.parse_xml(self.send_request(payload, verbose=False, timeout=20))
             if root is not None:
                 self.sid = root.get('sid')
                 print(f"✅ [1/5] Session init OK - SID: {self.sid}")

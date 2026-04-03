@@ -1226,7 +1226,17 @@ class ChatWindow(QWidget):
             try:
                 # Clear old state before reconnecting
                 QTimer.singleShot(0, self._clear_for_reconnect)
-            
+
+                # Properly close old session so server doesn't see a duplicate
+                if self.xmpp_client:
+                    print("🔌 Closing old session before reconnect...")
+                    try:
+                        self.xmpp_client.disconnect()
+                        print("✅ Old session closed")
+                    except Exception as ex:
+                        print(f"⚠️ Could not close old session: {ex}")
+                    self.xmpp_client = None
+
                 self.xmpp_client = XMPPClient(str(self.config_path))
                 if not self.xmpp_client.connect(self.account):
                     QTimer.singleShot(0, lambda: show_notification(
