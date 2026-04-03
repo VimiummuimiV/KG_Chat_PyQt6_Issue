@@ -260,58 +260,69 @@ class XMPPClient:
         except Exception as e:
             print(f"❌ Join error: {e}")
    
-    def send_message(self, body: str, to_jid: str = None, msg_type: str = 'groupchat'):
-        """Send message - supports both groupchat and private chat"""
+    def send_message(self, body: str, to_jid: str = None, msg_type: str = 'groupchat', max_retries: int = 5):
+        """Send message - supports both groupchat and private chat, with retry"""
         if not self.sid or not self.jid:
+            print(f"❌ Send aborted: sid={bool(self.sid)}, jid={bool(self.jid)}")
             return False
-       
+
         if self.connected_account is None:
+            print(f"❌ Send aborted: no connected account")
             return False
-       
+
         # Determine recipient
         if to_jid is None and msg_type == 'groupchat':
-            # Find default room for group chat
             rooms = self.account_manager.get_rooms()
             for room in rooms:
                 if room.get('auto_join'):
                     to_jid = room['jid']
                     break
-       
+
         if not to_jid:
+            print(f"❌ Send aborted: no target JID")
             return False
-       
-        self.rid += 1
-       
-        # Create message element
-        message = ET.Element('message', {
-            'xmlns': 'jabber:client',
-            'to': to_jid,
-            'type': msg_type,
-            'from': self.jid
-        })
-        ET.SubElement(message, 'body').text = body
-       
-        # Add userdata
-        x_data = ET.SubElement(message, 'x', {'xmlns': 'klavogonki:userdata'})
-        user = ET.SubElement(x_data, 'user')
-        ET.SubElement(user, 'login').text = self.connected_account['chat_username']
-       
-        # Add avatar if available
-        if self.connected_account.get('avatar'):
-            ET.SubElement(user, 'avatar').text = self.connected_account['avatar']
-        
-        # Use effective background (custom if exists, otherwise server)
-        bg = self._get_effective_background()
-        if bg:
-            ET.SubElement(user, 'background').text = bg
-       
-        try:
-            payload = self.build_body(children=[message])
-            response = self.send_request(payload, verbose=False, timeout=15)
-            return True
-        except Exception as e:
-            print(f"❌ Send error: {e}")
-            return False
+
+        # Build message element once, reuse across retries
+        def _build_payload():
+            self.rid += 1
+            message = ET.Element('message', {
+                'xmlns': 'jabber:client',
+                'to': to_jid,
+                'type': msg_type,
+                'from': self.jid
+            })
+            ET.SubElement(message, 'body').text = body
+
+            x_data = ET.SubElement(message, 'x', {'xmlns': 'klavogonki:userdata'})
+            user = ET.SubElement(x_data, 'user')
+            ET.SubElement(user, 'login').text = self.connected_account['chat_username']
+
+            if self.connected_account.get('avatar'):
+                ET.SubElement(user, 'avatar').text = self.connected_account['avatar']
+
+            bg = self._get_effective_background()
+            if bg:
+                ET.SubElement(user, 'background').text = bg
+
+            return self.build_body(children=[message])
+
+        for attempt in range(1, max_retries + 1):
+            try:
+                print(f"📤 Sending message attempt {attempt}/{max_retries} to {to_jid} (RID: {self.rid + 1})")
+                payload = _build_payload()
+                response = self.send_request(payload, verbose=False, timeout=15)
+                print(f"✅ Message sent OK on attempt {attempt}")
+                return True
+            except Exception as e:
+                print(f"❌ Send error attempt {attempt}/{max_retries}: {type(e).__name__}: {e}")
+                if attempt < max_retries:
+                    import time
+                    wait = min(attempt * 2, 10)  # 2s, 4s, 6s, 8s, 10s between retries
+                    print(f"🔁 Retrying in {wait}s...")
+                    time.sleep(wait)
+                else:
+                    print(f"❌ All {max_retries} send attempts failed for message: {body[:50]}")
+                    return False
    
     def _process_response(self, xml_text: str, is_initial_roster: bool = False):
         """Process response"""
