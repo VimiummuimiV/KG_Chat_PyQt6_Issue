@@ -870,8 +870,8 @@ class ChatWindow(QWidget):
 
     def exit_private_mode(self):
         """Exit private chat mode"""
-        # Clear all private messages
-        self._clear_private_messages()
+        if self.config.get("ui", "clear_private_messages_on_exit"):
+            self._clear_private_messages()
     
         self.private_mode = False
         self.private_chat_jid = None

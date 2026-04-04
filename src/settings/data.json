@@ -43,7 +43,7 @@
   "834152": {"login": "Pronvad", "background": "#777777", "light": "#767676", "dark": "#858585"},
   "548449": {"login": "viktorp", "background": "#777777", "light": "#767676", "dark": "#858585"},
   "827176": {"login": "1971", "background": "#777777", "light": "#767676", "dark": "#858585"},
-  "794622": {"login": "Ri_chu_long", "background": "#989400", "light": "#7d7a00", "dark": "#989400"},
+  "794622": {"login": "Ri_chu_long", "background": "#a00068", "light": "#a00068", "dark": "#fc00a4"},
   "830606": {"login": "fdgsdfgre", "background": "#777777", "light": "#767676", "dark": "#858585"},
   "544858": {"login": "SpiritCrusher", "background": "#000000", "light": "#000000", "dark": "#858585"},
   "833187": {"login": "Danlkd", "background": "#777777", "light": "#767676", "dark": "#858585"},
@@ -3910,5 +3910,7 @@
   "275817": {"login": "lovik", "background": "#F20C1B", "light": "#ec0c1a", "dark": "#f53e4a"},
   "836287": {"login": "Majka2308", "background": "#777777", "light": "#767676", "dark": "#858585"},
   "836348": {"login": "EXTAZYFN", "background": "#777777", "light": "#767676", "dark": "#858585"},
-  "761747": {"login": "Захар82", "background": "#7f7f7f", "light": "#767676", "dark": "#858585"}
+  "761747": {"login": "Захар82", "background": "#7f7f7f", "light": "#767676", "dark": "#858585"},
+  "836399": {"login": "вуменмомент", "background": "#777777", "light": "#767676", "dark": "#858585"},
+  "723435": {"login": "reapeatests144", "background": "#777777", "light": "#767676", "dark": "#858585"}
 }
